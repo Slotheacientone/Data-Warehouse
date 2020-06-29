@@ -91,7 +91,7 @@ public class ExportDataToCSV {
 	}
 
 	public static void main(String[] args) {
-		Test exporter = new Test();
+		ExportDataToCSV exporter = new ExportDataToCSV();
 		exporter.export("HOCVIEN");
 		System.out.println("Export success!"); // Export ra file HOCVIEN_Export_2020-06-29_03-00-32.csv  thành công
 	}
