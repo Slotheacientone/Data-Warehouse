@@ -27,7 +27,7 @@ public class ReadExcel {
 		Connection connectionControl = DriverManager.getConnection("jdbc:mysql://localhost:3306/db_control","root", "");
 		Statement statementControl = connectionControl.createStatement();
 
-		ResultSet resultSetLog = statementControl.executeQuery("SELECT * FROM log WHERE log.Status= 'ER';");
+		ResultSet resultSetLog = statementControl.executeQuery("SELECT * FROM log WHERE log.Status= 'ER' LIMIT 1;");
 		ArrayList<String> listFileName = new ArrayList<String>();
 		ArrayList<String> listFileStatus = new ArrayList<String>();
 		while (resultSetLog.next()){
