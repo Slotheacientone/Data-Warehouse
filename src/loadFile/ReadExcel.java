@@ -1,6 +1,5 @@
 package loadFile;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -18,46 +16,56 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import connection.JDBCConnection;
+
 public class ReadExcel {
 
-	public static void readExcel() throws IOException, ClassNotFoundException, SQLException
+	public static void readExcel(int idFile) throws IOException, ClassNotFoundException, SQLException
 	{
 		//connect database
-		Class.forName("com.mysql.jdbc.Driver");
-		Connection connectionControl = DriverManager.getConnection("jdbc:mysql://localhost:3306/db_control","root", "");
+		String url = "jdbc:mysql://localhost:3306/db_control";
+		String user = "root";
+		String pass = "";
+		Connection connectionControl = JDBCConnection.getJDBCConnection(url,user,pass);
 		Statement statementControl = connectionControl.createStatement();
-
-		ResultSet resultSetLog = statementControl.executeQuery("SELECT * FROM log WHERE log.Status= 'ER' LIMIT 1;");
-		ArrayList<String> listFileName = new ArrayList<String>();
-		ArrayList<String> listFileStatus = new ArrayList<String>();
+		ResultSet resultSetLog = statementControl.executeQuery("SELECT * FROM log WHERE log.Status= 'ER' AND log.Id_File = "+idFile+" LIMIT 1;");
 		while (resultSetLog.next()){
-
-			String fileName = resultSetLog.getString(2);
-			listFileName.add(fileName);
+			String sourceFile = resultSetLog.getString(5);
 			String fileStatus = resultSetLog.getString(3);
-			listFileStatus.add(fileStatus);
-		}
-		for (String fileName:listFileName)
-		{
-			
-			ResultSet resultSet = statementControl.executeQuery("SELECT* FROM control WHERE control.name_file= \""+fileName+"\"");
+			ResultSet resultSet = statementControl.executeQuery("SELECT* FROM control WHERE control.Id_File= "+idFile);
 			while (resultSet.next()){
-				
-				String source = resultSet.getString(2);
 				String destination = resultSet.getString(3);
-				String username = resultSet.getString(7);
-				String password = resultSet.getString(8);
+				String username = resultSet.getString(4);
+				String password = resultSet.getString(5);
+				String fields = resultSet.getString(6);
+				Connection connection = JDBCConnection.getJDBCConnection(destination, username, password);
 				
-				Connection connection = DriverManager.getConnection(destination, username, password);
-				FileInputStream fileInputStream = new FileInputStream(source);
-				//		FileInputStream fileInputStream = new FileInputStream("D:\\CNTT\\HK8\\Data Warehouse\\sinhvien_chieu_nhom14.xlsx");
+				FileInputStream fileInputStream = new FileInputStream(sourceFile);
 				XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
 				XSSFSheet sheet = workbook.getSheetAt(0);
 				Iterator<Row> rowIterator = sheet.iterator();
 				rowIterator.next();
 				
-				//        String sql = "INSERT INTO students (Mssv, Last_name, First_name,Date_of_birth, Class_ID, Class_name, Sdt, Email, QueQuan) VALUES (?,?,?,?,?,?,?,?,?)";
-				String sql = "INSERT INTO students (Mssv, Last_name, First_name,Date_of_birth, Class_ID, Class_name, Sdt, Email, QueQuan, Note) VALUES (?,?,?,?,?,?,?,?,?,'Null')";
+				String sql = "INSERT INTO students (";
+				String[] arFiels = fields.split("\\,");
+				for (int i =0;i<arFiels.length;i++) {
+					if(i==0) {
+						sql+=arFiels[i];
+					}else {
+						sql+=","+arFiels[i];
+					}
+					
+				}
+				sql+=") VALUES (";
+				for (int i =0;i<arFiels.length-1;i++) {
+					if(i==0) {
+						sql+="?";
+					}else {
+						sql+=",?";
+					}
+					
+				}
+				sql+=",'Null')";
 				PreparedStatement statement2 = connection.prepareStatement(sql);
 				
 				while (rowIterator.hasNext()) {
@@ -74,73 +82,53 @@ public class ReadExcel {
 						case 1:
 							int mssvInt = (int) nextCell.getNumericCellValue();
 							String mssv =  ""+mssvInt;
-							//                        System.out.print(mssv+"\t");
 							statement2.setString(1, mssv);
 							break;
 						case 2:
 							String lastName = nextCell.getStringCellValue();
-							//                        System.out.print(lastName+"\t");
 							statement2.setString(2, lastName);
 							break;
 						case 3:
 							String firstName = nextCell.getStringCellValue();
-							//                        System.out.print(firstName+"\t");
 							statement2.setString(3, firstName);
 							break;
 						case 4:
 							Date dateOfBirth =  nextCell.getDateCellValue();
-							//                        System.out.print(getString(dateOfBirth)+"\t");
 							statement2.setString(4, getString(dateOfBirth));
 							break;
 						case 5:
 							String classID = nextCell.getStringCellValue();
-							//                        System.out.print(classID+"\t");
 							statement2.setString(5, classID);
 							break;
 						case 6:
 							String className = nextCell.getStringCellValue();
-							//                        System.out.print(className+"\t");
 							statement2.setString(6, className);
 							break;
 							
 						case 7:
 							int sdtInt = (int) nextCell.getNumericCellValue();
 							String sdt = ""+sdtInt;
-							//                        System.out.print(sdt+"\t");
 							statement2.setString(7, sdt);
 							break;
 						case 8:
 							String email = nextCell.getStringCellValue();
-							//                        System.out.print(email+"\t");
 							statement2.setString(8, email);
 							break;
 						case 9:
 							String queQuan = nextCell.getStringCellValue();
-							//                        System.out.print(queQuan+"\t");
 							statement2.setString(9, queQuan);
 							break;
 						case 10:
 							String note = "Null";
-							//                        System.out.print(note+"\t");
-							//                       if (nextCell.getStringCellValue()!=null)
-							//                        {
-							//                        	note=nextCell.getStringCellValue();
-							//                        }
 							
 							statement2.setString(10, note);
 							break;
 						}
 						
 					}
-					//            System.out.println();
 					statement2.execute();
 					
 				}
-//				String sql2 = "UPDATE log SET log.Status = 'Test' WHERE log.File_name ='"+fileName+"';";
-//
-////				ResultSet resultSetLog2 = statementControl.executeUpdate(sql2);
-//				statement2 = connectionControl.prepareStatement(sql2);
-//				statement2.executeUpdate();
 				workbook.close();
 				fileInputStream.close();
 				statement2.close();
@@ -154,8 +142,7 @@ public class ReadExcel {
 		return new SimpleDateFormat("yyyy-MM-dd").format(d);
 	}
 	public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {
-		readExcel();
-
+		readExcel(1);
 	}
 
 }
