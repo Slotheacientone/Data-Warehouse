@@ -1,52 +1,111 @@
 package loadFile;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
+import connection.JDBCConnection;
+
 public class ReadTXT {
-	public String readValuesTXT(File s_file, int count_field) {
+	public static void readValuesTXT(String destination, String username, String password, String fields,String sourceFile, File s_file, int count_field, String delimiter) throws SQLException {
 		if (!s_file.exists()) {
-			return null;
+			return;
 		}
-		String values = "";
-		String delim = "\t"; 
+		Connection connection = JDBCConnection.getJDBCConnection(destination, username, password);
+		// tạo câu query
+		String sql = "INSERT INTO students (";
+		String[] arFiels = fields.split("\\,");
+		for (int i = 0; i < arFiels.length; i++) {
+			if (i == 0) {
+				sql += arFiels[i];
+			} else {
+				sql += "," + arFiels[i];
+			}
+		}
+		sql += ") VALUES (";
+		for (int i = 0; i < arFiels.length - 1; i++) {
+			if (i == 0) {
+				sql += "?";
+			} else {
+				sql += ",?";
+			}
+		}
+		sql += ",'Null')";
+		PreparedStatement statement2 = connection.prepareStatement(sql);
 		try {
 			BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(s_file), "utf8"));
 			String line = bReader.readLine();
 			// Kiểm tra xem tổng số field trong file có đúng format
-			if (new StringTokenizer(line, delim).countTokens() != (count_field + 1)) {
+			if (new StringTokenizer(line, delimiter).countTokens() != (count_field + 1)) {
 				bReader.close();
-				return null;
+				return;
 			}
 			while ((line = bReader.readLine()) != null) {
-				values += readLines(line + " " + delim, delim);
+				String[] arrValue = line.split(delimiter);
+				for (int i = 1; i < arrValue.length; i++) {
+					switch (i) {
+					case 1:
+						String mssv = "" + arFiels[i];
+						statement2.setString(1, mssv);
+						break;
+					case 2:
+						String lastName = "" + arFiels[i];
+						statement2.setString(2, lastName);
+						break;
+					case 3:
+						String firstName = "" + arFiels[i];
+						statement2.setString(3, firstName);
+						break;
+					case 4:
+						String dateOfBirth = "" + arFiels[i];
+						statement2.setString(4, dateOfBirth);
+						break;
+					case 5:
+						String classID = "" + arFiels[i];
+						statement2.setString(5, classID);
+						break;
+					case 6:
+						String className = "" + arFiels[i];
+						statement2.setString(6, className);
+						break;
+					case 7:
+						String sdt = "" + arFiels[i];
+						statement2.setString(7, sdt);
+						break;
+					case 8:
+						String email = "" + arFiels[i];
+						statement2.setString(8, email);
+						break;
+					case 9:
+						String queQuan = "" + arFiels[i];
+						statement2.setString(9, queQuan);
+						break;
+					case 10:
+						System.out.println("abc");
+						String note = "Null";
+//					if(nextCell.getCellType()!=null)
+//					{
+//						note += nextCell.getStringCellValue();
+//					}else {
+//						note += "Null";
+//					}
+						statement2.setString(10, note);
+						break;
+					}
+				}
+				statement2.execute();
 			}
 			bReader.close();
-			return values.substring(0, values.length() - 1);
 		} catch (NoSuchElementException | IOException e) {
 			e.printStackTrace();
-			return null;
+			return;
 		}
-	}
-	private String readLines(String value, String delim) {
-		String values = "";
-		StringTokenizer stoken = new StringTokenizer(value, delim);
-		int countToken = stoken.countTokens() - 1;
-		String lines = "(";
-		String token = "";
-		stoken.nextToken();
-		for (int j = 0; j < countToken; j++) {
-			token = stoken.nextToken();
-			lines += (j == countToken - 1) ? '"' + token.trim() + '"' + ")," : '"' + token.trim() + '"' + ",";
-			values += lines;
-			lines = "";
-		}
-		return values;
 	}
 }
