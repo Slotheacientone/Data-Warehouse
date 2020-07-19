@@ -28,10 +28,13 @@ public class ReadFile {
 				String destination = resultSet.getString(3);
 				String username = resultSet.getString(4);
 				String password = resultSet.getString(5);
+				String delimiter = resultSet.getString(8);
 				//tất cả field của loại file
 				String fields = resultSet.getString(6);
 				if (typeFile.equals("xlsx")) {
 					ReadExcel.readExcel(destination, username, password, fields, sourceFile);
+				}else if(typeFile.equals("txt")){
+					ReadTXT.readValuesTXT(destination, username, password, fields, sourceFile, delimiter);
 				}
 				
 			}

@@ -14,8 +14,9 @@ import java.util.StringTokenizer;
 import connection.JDBCConnection;
 
 public class ReadTXT {
-	public static void readValuesTXT(String destination, String username, String password, String fields,String sourceFile, File s_file, int count_field, String delimiter) throws SQLException {
-		if (!s_file.exists()) {
+	public static void readValuesTXT(String destination, String username, String password, String fields,String sourceFile, String delimiter) throws SQLException {
+		File file = new File(sourceFile);
+		if (!file.exists()) {
 			return;
 		}
 		Connection connection = JDBCConnection.getJDBCConnection(destination, username, password);
@@ -40,69 +41,71 @@ public class ReadTXT {
 		sql += ",'Null')";
 		PreparedStatement statement2 = connection.prepareStatement(sql);
 		try {
-			BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(s_file), "utf8"));
+			BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf8"));
 			String line = bReader.readLine();
 			// Kiểm tra xem tổng số field trong file có đúng format
-			if (new StringTokenizer(line, delimiter).countTokens() != (count_field + 1)) {
-				bReader.close();
-				return;
-			}
+//			if (new StringTokenizer(line, delimiter).countTokens() != (arFiels.length+1)) {
+//				bReader.close();
+//				return;
+//			}
 			while ((line = bReader.readLine()) != null) {
 				String[] arrValue = line.split(delimiter);
 				for (int i = 1; i < arrValue.length; i++) {
 					switch (i) {
 					case 1:
-						String mssv = "" + arFiels[i];
+						
+						String mssv = "" + arrValue[i];
 						statement2.setString(1, mssv);
 						break;
 					case 2:
-						String lastName = "" + arFiels[i];
+						String lastName = "" + arrValue[i];
 						statement2.setString(2, lastName);
 						break;
 					case 3:
-						String firstName = "" + arFiels[i];
+						String firstName = "" + arrValue[i];
 						statement2.setString(3, firstName);
 						break;
 					case 4:
-						String dateOfBirth = "" + arFiels[i];
+						String dateOfBirth = "" + arrValue[i];
 						statement2.setString(4, dateOfBirth);
 						break;
 					case 5:
-						String classID = "" + arFiels[i];
+						String classID = "" + arrValue[i];
 						statement2.setString(5, classID);
 						break;
 					case 6:
-						String className = "" + arFiels[i];
+						String className = "" + arrValue[i];
 						statement2.setString(6, className);
 						break;
 					case 7:
-						String sdt = "" + arFiels[i];
+						String sdt = "" + arrValue[i];
 						statement2.setString(7, sdt);
 						break;
 					case 8:
-						String email = "" + arFiels[i];
+						String email = "" + arrValue[i];
 						statement2.setString(8, email);
 						break;
 					case 9:
-						String queQuan = "" + arFiels[i];
+						String queQuan = "" + arrValue[i];
 						statement2.setString(9, queQuan);
 						break;
-					case 10:
-						System.out.println("abc");
-						String note = "Null";
+//					case 10:
+//						System.out.println("abc");
+//						String note = "Null";
 //					if(nextCell.getCellType()!=null)
 //					{
 //						note += nextCell.getStringCellValue();
 //					}else {
 //						note += "Null";
 //					}
-						statement2.setString(10, note);
-						break;
+//						statement2.setString(10, note);
+//						break;
 					}
 				}
 				statement2.execute();
 			}
 			bReader.close();
+			System.out.println("Done!");
 		} catch (NoSuchElementException | IOException e) {
 			e.printStackTrace();
 			return;
