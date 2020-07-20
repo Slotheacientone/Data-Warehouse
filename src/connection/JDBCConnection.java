@@ -3,8 +3,12 @@ package connection;
 import java.sql.*;
 
 public class JDBCConnection {
-	public static Connection getJDBCConnection(String url, String user, String password) {
+	public static Connection getConnection(String database) {
 		try {
+			String url = "jdbc:mysql://localhost:3306/";
+			String user = "root";
+			String password = "";
+			url = url + database;
 			Class.forName("com.mysql.jdbc.Driver");
 			return DriverManager.getConnection(url, user, password);
 		} catch (ClassNotFoundException e) {
@@ -16,18 +20,16 @@ public class JDBCConnection {
 		}
 		return null;
 	}
-	public static ResultSet readTable(String sql) throws SQLException {
-		Connection connection = getJDBCConnection("jdbc:mysql://localhost:3306/db_control", "root", "$Ngay22031999");
+
+	public static ResultSet readTable(String database, String sql) throws SQLException {
+		Connection connection = getConnection(database);
 		Statement statement = connection.createStatement();
-		ResultSet resultSet = statement.executeQuery(sql);
-		return resultSet;
+		return statement.executeQuery(sql);
 	}
 
-	public static boolean writeTable(String sql) throws SQLException {
-		boolean result = false;
-		Connection connection = getJDBCConnection("jdbc:mysql://localhost:3306/db_control", "root", "$Ngay22031999");
+	public static boolean writeTable(String database, String sql) throws SQLException {
+		Connection connection = getConnection(database);
 		Statement statement = connection.createStatement();
-		result = statement.execute(sql);
-		return result;
+		return statement.execute(sql);
 	}
 }
