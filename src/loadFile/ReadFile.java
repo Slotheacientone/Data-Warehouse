@@ -19,12 +19,12 @@ public class ReadFile {
             String fileStatus = resultSetLog.getString(3);
             String typeFile = resultSetLog.getString(6);
             //lấy định loại file trong control vd sinhvien
-            ResultSet resultSet = statementControl.executeQuery("SELECT* FROM control WHERE control.Id_File= " + idFile);
+            ResultSet resultSet = statementControl.executeQuery("SELECT* FROM config WHERE config.Id_File= " + idFile);
             if (resultSet.next()) {
                 String destination = resultSet.getString(3);
                 //tất cả field của loại file
-                String fields = resultSet.getString(6);
-                String delimiter = resultSet.getString(8);
+                String fields = resultSet.getString(4);
+                String delimiter = resultSet.getString(6);
                 if (typeFile.equals("xlsx")) {
                     ReadExcel.readExcel(destination, fields, sourceFile);
                 }else if(typeFile.equals("txt")){
