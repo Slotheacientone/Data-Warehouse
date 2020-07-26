@@ -7,9 +7,9 @@ public class JDBCConnection {
 		try {
 			String url = "jdbc:mysql://localhost:3306/";
 			String user = "root";
-			String password = "";
+			String password = "$Ngay22031999";
 			url = url + database;
-			Class.forName("com.mysql.jdbc.Driver");
+			Class.forName("com.mysql.cj.jdbc.Driver");
 			return DriverManager.getConnection(url, user, password);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -19,17 +19,5 @@ public class JDBCConnection {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	public static ResultSet readTable(String database, String sql) throws SQLException {
-		Connection connection = getConnection(database);
-		Statement statement = connection.createStatement();
-		return statement.executeQuery(sql);
-	}
-
-	public static boolean writeTable(String database, String sql) throws SQLException {
-		Connection connection = getConnection(database);
-		Statement statement = connection.createStatement();
-		return statement.execute(sql);
 	}
 }
