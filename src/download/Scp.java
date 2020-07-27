@@ -34,6 +34,9 @@ public class Scp {
         Process process = processBuilder.start();
         process.waitFor();
         File tempFolder = new File("temp");
+        if(!tempFolder.exists()){
+            tempFolder.mkdir();
+        }
         File[] listFileTemp = tempFolder.listFiles();
         ArrayList<String> listFileDownloaded = new ArrayList<>();
         Statement logStatement = connection.createStatement();
@@ -44,6 +47,10 @@ public class Scp {
         resultSetLog.close();
         logStatement.close();
         PreparedStatement preparedStatementLog = connection.prepareStatement("INSERT INTO `db_control`.`log` (Id_File, Status, File_Name, Source_File, Type_File, Time) VALUES (?,?,?,?,?,?)");
+        File dataFolder = new File("data");
+        if(!dataFolder.exists()){
+            dataFolder.mkdir();
+        }
         for (File file : listFileTemp) {
             if (!listFileDownloaded.contains(file.getName())) {
                 Files.copy(file.toPath(), new File("data/" + file.getName()).toPath());
