@@ -20,7 +20,7 @@ import java.util.Iterator;
 
 public class ReadExcel {
 
-	public static void readExcel(String destination, String fields, String sourceFile)
+	public static boolean readExcel(String destination, String fields, String sourceFile)
 			{
 		// tạo câu query1 cho những câu không có ghi chú và query 2 cho câu có ghi chú
 		String sql = "INSERT INTO students (";
@@ -106,20 +106,25 @@ public class ReadExcel {
 			statement2.close();
 			connection.close();
 			System.out.println("Done!");
+			return true;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Err!");
 			e.printStackTrace();
+			return false;
 			
 		}catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Err!");
 			e.printStackTrace();
+			return false;
 		}
 		catch (SQLException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Err!");
+			
 			e.printStackTrace();
+			return false;
 		}
 		
 

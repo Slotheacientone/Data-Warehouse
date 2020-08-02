@@ -31,6 +31,7 @@ public class ReadFile {
             String sourceFile = resultSetLog.getString(5);
             String nameFile = resultSetLog.getString(4);
             String typeFile = resultSetLog.getString(6);
+            String update="err";
             //lấy định loại file trong control vd sinhvien
             ResultSet resultSet = statementControl.executeQuery("SELECT* FROM config WHERE config.id= " + idFile);
             if (resultSet.next()) {
@@ -39,12 +40,16 @@ public class ReadFile {
                 String fields = resultSet.getString(4);
                 String delimiter = resultSet.getString(6);
                 if (typeFile.equals("xlsx")) {
-                    ReadExcel.readExcel(destination, fields, sourceFile);
+                	if(ReadExcel.readExcel(destination, fields, sourceFile)) {
+                		update ="loaded";
+                	}
                 }else if(typeFile.equals("txt")){
-                    ReadTXT.readValuesTXT(destination,fields, sourceFile, delimiter);
+                    if(ReadTXT.readValuesTXT(destination,fields, sourceFile, delimiter)) {
+                    	update ="loaded";
+                    }
                 }
             }
-            String sqlUpdateStatusLog ="UPDATE log SET log.Status = 'loaded' WHERE log.File_Name='"+nameFile+"';";
+            String sqlUpdateStatusLog ="UPDATE log SET log.Status = '"+update+"' WHERE log.File_Name='"+nameFile+"';";
             statementControl.execute(sqlUpdateStatusLog);
         }
         statementControl.close();

@@ -10,10 +10,10 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 public class ReadTXT {
-    public static void readValuesTXT(String destination, String fields,String sourceFile, String delimiter) throws SQLException {
+    public static boolean readValuesTXT(String destination, String fields,String sourceFile, String delimiter) throws SQLException {
         File file = new File(sourceFile);
         if (!file.exists()) {
-            return;
+            return false;
         }
         Connection connection = JDBCConnection.getConnection(destination);
         // tạo câu query
@@ -104,9 +104,10 @@ public class ReadTXT {
             System.out.println("Done!");
         } catch (NoSuchElementException | IOException e) {
             e.printStackTrace();
-            return;
+            return false;
         }
         statement2.close();
         connection.close();
+        return true;
     }
 }
