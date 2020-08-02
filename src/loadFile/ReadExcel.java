@@ -20,10 +20,20 @@ import java.util.Iterator;
 
 public class ReadExcel {
 
-	public static boolean readExcel(String destination, String fields, String sourceFile)
+	public static boolean readExcel(String destination, String fields, String sourceFile,int idFile)
 			{
 		// tạo câu query1 cho những câu không có ghi chú và query 2 cho câu có ghi chú
-		String sql = "INSERT INTO students (";
+		String table = null;
+		if(idFile==1) {
+			table = "students";
+		}else if(idFile==2){
+			table = "monhoc";
+		}else if(idFile ==3) {
+			table = "lophoc";
+		}else if(idFile==4) {
+			table ="dangky";
+		}
+		String sql = "INSERT INTO "+table+" (";
 		String[] arFiels = fields.split("\\,");
 		for (int i = 0; i < arFiels.length; i++) {
 			if (i == 0) {
@@ -56,18 +66,19 @@ public class ReadExcel {
 			 
 			// đọc sheet thứ nhất
 			XSSFSheet sheet = workbook.getSheetAt(0);
-			FormulaEvaluator formula = workbook.getCreationHelper().createFormulaEvaluator();
 			Iterator<Row> rowIterator = sheet.iterator();
 			rowIterator.next();
 			while (rowIterator.hasNext()) {
 				// lấy phần tử hiện tại
 				Row nextRow = rowIterator.next();
+				// last = vị trí cell cuối cùng
 				int last = nextRow.getLastCellNum();
-				if (last == arFiels.length + 1) {
-					
+				//file có ô stt nên fiels phải thêm 1
+				if (arFiels.length+1==last ) {
 						statement2 = connection.prepareStatement(sql2);
 					 
-				} else if (last == arFiels.length) {
+				}// không thêm 1 vì không đọc ô ghi chú
+				else if (arFiels.length== last) {
 					statement2 = connection.prepareStatement(sql);
 				} else {
 					continue;
@@ -82,13 +93,13 @@ public class ReadExcel {
 						count++;
 						switch (cellType) {
 						case NUMERIC:
-							int mssvInt = (int) nextCell.getNumericCellValue();
-							String mssv = "" + mssvInt;
-							statement2.setString(columnIndex, mssv);
+							int valueInt = (int) nextCell.getNumericCellValue();
+							String value = "" + valueInt;
+							statement2.setString(columnIndex, value);
 							break;
 						case STRING:
-							String lastName = nextCell.getStringCellValue();
-							statement2.setString(columnIndex, lastName);
+							String valueString = nextCell.getStringCellValue();
+							statement2.setString(columnIndex, valueString);
 							break;
 						default:
 							statement2.setString(columnIndex, "Null");

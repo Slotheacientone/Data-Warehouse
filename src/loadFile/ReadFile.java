@@ -39,14 +39,26 @@ public class ReadFile {
                 //tất cả field của loại file
                 String fields = resultSet.getString(4);
                 String delimiter = resultSet.getString(6);
-                if (typeFile.equals("xlsx")) {
-                	if(ReadExcel.readExcel(destination, fields, sourceFile)) {
-                		update ="loaded";
+                if(idFile==1) {
+                	if (typeFile.equals("xlsx")) {
+                		if(ReadExcel.readExcel(destination, fields, sourceFile,idFile)) {
+                			update ="loaded";
+                		}
+                	}else if(typeFile.equals("txt")){
+                		if(ReadTXT.readValuesTXT(destination,fields, sourceFile, delimiter,idFile)) {
+                			update ="loaded";
+                		}
                 	}
-                }else if(typeFile.equals("txt")){
-                    if(ReadTXT.readValuesTXT(destination,fields, sourceFile, delimiter)) {
-                    	update ="loaded";
-                    }
+                }else if(idFile==2) {
+                	if (typeFile.equals("xlsx")) {
+                		if(ReadExcelForMonHoc.readExcel(destination, fields, sourceFile,idFile)) {
+                			update ="loaded";
+                		}
+                	}else if(typeFile.equals("txt")){
+                		if(ReadTXT.readValuesTXT(destination,fields, sourceFile, delimiter,idFile)) {
+                			update ="loaded";
+                		}
+                	}
                 }
             }
             String sqlUpdateStatusLog ="UPDATE log SET log.Status = '"+update+"' WHERE log.File_Name='"+nameFile+"';";

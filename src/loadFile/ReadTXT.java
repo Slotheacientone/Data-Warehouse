@@ -10,104 +10,77 @@ import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 public class ReadTXT {
-    public static boolean readValuesTXT(String destination, String fields,String sourceFile, String delimiter) throws SQLException {
-        File file = new File(sourceFile);
-        if (!file.exists()) {
-            return false;
-        }
-        Connection connection = JDBCConnection.getConnection(destination);
-        // tạo câu query
-        String sql = "INSERT INTO students (";
-        String[] arFiels = fields.split("\\,");
-        for (int i = 0; i < arFiels.length; i++) {
-            if (i == 0) {
-                sql += arFiels[i];
-            } else {
-                sql += "," + arFiels[i];
-            }
-        }
-        sql += ") VALUES (";
-        for (int i = 0; i < arFiels.length - 1; i++) {
-            if (i == 0) {
-                sql += "?";
-            } else {
-                sql += ",?";
-            }
-        }
-        sql += ",'Null')";
-        PreparedStatement statement2 = connection.prepareStatement(sql);
-        try {
-            BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf8"));
-            String line = bReader.readLine();
-            // Kiểm tra xem tổng số field trong file có đúng format
-//			if (new StringTokenizer(line, delimiter).countTokens() != (arFiels.length+1)) {
-//				bReader.close();
-//				return;
-//			}
-            while ((line = bReader.readLine()) != null) {
-                String[] arrValue = line.split(delimiter);
-                for (int i = 1; i < arrValue.length; i++) {
-                    switch (i) {
-                        case 1:
+	public static boolean readValuesTXT(String destination, String fields, String sourceFile, String delimiter,int idFile)
+			throws SQLException {
+		File file = new File(sourceFile);
+		if (!file.exists()) {
+			return false;
+		}
+		// tạo câu query1 cho những câu không có ghi chú và query 2 cho câu có ghi chú
+		String table = null;
+		if(idFile==1) {
+			table = "students";
+		}else if(idFile==2){
+			table = "monhoc";
+		}else if(idFile ==3) {
+			table = "lophoc";
+		}else if(idFile==4) {
+			table ="dangky";
+		}
+		String sql = "INSERT INTO "+table+" (";
+		String[] arFiels = fields.split("\\,");
+		for (int i = 0; i < arFiels.length; i++) {
+			if (i == 0) {
+				sql += arFiels[i];
+			} else {
+				sql += "," + arFiels[i];
+			}
+		}
+		sql += ") VALUES (";
+		for (int i = 0; i < arFiels.length - 1; i++) {
+			if (i == 0) {
+				sql += "?";
+			} else {
+				sql += ",?";
+			}
+		}
+		String sql2 = sql;
+		sql2 += ",?)";
+		sql += ",'Null')";
 
-                            String mssv = "" + arrValue[i];
-                            statement2.setString(1, mssv);
-                            break;
-                        case 2:
-                            String lastName = "" + arrValue[i];
-                            statement2.setString(2, lastName);
-                            break;
-                        case 3:
-                            String firstName = "" + arrValue[i];
-                            statement2.setString(3, firstName);
-                            break;
-                        case 4:
-                            String dateOfBirth = "" + arrValue[i];
-                            statement2.setString(4, dateOfBirth);
-                            break;
-                        case 5:
-                            String classID = "" + arrValue[i];
-                            statement2.setString(5, classID);
-                            break;
-                        case 6:
-                            String className = "" + arrValue[i];
-                            statement2.setString(6, className);
-                            break;
-                        case 7:
-                            String sdt = "" + arrValue[i];
-                            statement2.setString(7, sdt);
-                            break;
-                        case 8:
-                            String email = "" + arrValue[i];
-                            statement2.setString(8, email);
-                            break;
-                        case 9:
-                            String queQuan = "" + arrValue[i];
-                            statement2.setString(9, queQuan);
-                            break;
-//					case 10:
-//						System.out.println("abc");
-//						String note = "Null";
-//					if(nextCell.getCellType()!=null)
-//					{
-//						note += nextCell.getStringCellValue();
-//					}else {
-//						note += "Null";
-//					}
-//						statement2.setString(10, note);
-//						break;
-                    }
-                }
-                statement2.execute();
-            }
-            bReader.close();
-            System.out.println("Done!");
-        } catch (NoSuchElementException | IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        statement2.close();
-        connection.close();
-        return true;
-    }
+		Connection connection = JDBCConnection.getConnection(destination);
+		PreparedStatement statement2 = null;
+		try {
+			BufferedReader bReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf8"));
+			String line = bReader.readLine();
+			// Kiểm tra xem tổng số field trong file có đúng format
+			while ((line = bReader.readLine()) != null) {
+				String[] arrValue = line.split(delimiter);
+				// file có ô stt nên fiels phải thêm 1
+				if (arFiels.length + 1 == arrValue.length) {
+					statement2 = connection.prepareStatement(sql2);
+				} // file có ô stt và ghi chú ==null
+				else if (arFiels.length == arrValue.length) {
+					statement2 = connection.prepareStatement(sql);
+				} else {
+					continue;
+				}
+				for (int i = 1; i < arrValue.length; i++) {
+					String value = "" + arrValue[i];
+					statement2.setString(i, value);
+				}
+				statement2.execute();
+			}
+			bReader.close();
+			System.out.println("Done!");
+			statement2.close();
+			connection.close();
+			return true;
+		} catch (NoSuchElementException | IOException e) {
+			System.out.println("err");
+			e.printStackTrace();
+			return false;
+		}
+
+	}
 }
