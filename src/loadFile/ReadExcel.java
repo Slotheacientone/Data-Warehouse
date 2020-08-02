@@ -77,7 +77,7 @@ public class ReadExcel {
 				if (arFiels.length+1==last ) {
 						statement2 = connection.prepareStatement(sql2);
 					 
-				}// không thêm 1 vì không đọc ô ghi chú
+				}// không thêm 1 vì không đọc ô cuối (ghi chú)
 				else if (arFiels.length== last) {
 					statement2 = connection.prepareStatement(sql);
 				} else {
