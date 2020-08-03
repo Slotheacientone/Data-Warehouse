@@ -1,13 +1,16 @@
 package loadFile;
 
-import connection.JDBCConnection;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
+
+import connection.JDBCConnection;
 
 public class ReadTXT {
 	public static boolean readValuesTXT(String destination, String fields, String sourceFile, String delimiter,int idFile)
