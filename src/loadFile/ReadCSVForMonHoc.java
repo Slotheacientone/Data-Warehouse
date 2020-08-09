@@ -13,8 +13,8 @@ import java.util.NoSuchElementException;
 import connection.JDBCConnection;
 import sendMail.SendMailSSL;
 
-public class ReadTXT {
-	public static boolean readValuesTXT(String destination, String fields, String sourceFile, String delimiter,int idFile){
+public class ReadCSVForMonHoc {
+	public static boolean readValuesCSV(String destination, String fields, String sourceFile,int idFile){
 		File file = new File(sourceFile);
 		if (!file.exists()) {
 			return false;
@@ -61,19 +61,19 @@ public class ReadTXT {
 			String line = bReader.readLine();
 			// Kiểm tra xem tổng số field trong file có đúng format
 			while ((line = bReader.readLine()) != null) {
-				String[] arrValue = line.split(delimiter);
-				// file có ô stt nên fiels phải thêm 1
-				if (arFiels.length + 1 == arrValue.length) {
+				String[] arrValue = line.split(",");
+				if (arFiels.length == arrValue.length) {
 					statement2 = connection.prepareStatement(sql2);
-				} // file có ô stt và ghi chú ==null
-				else if (arFiels.length == arrValue.length) {
+				} // file có ô ghi chú ==null
+				else if (arFiels.length-1 == arrValue.length) {
 					statement2 = connection.prepareStatement(sql);
-				} else {
+				} 
+				else {
 					continue;
 				}
-				for (int i = 1; i < arrValue.length; i++) {
+				for (int i = 0; i < arrValue.length; i++) {
 					String value = "" + arrValue[i];
-					statement2.setString(i, value);
+					statement2.setString(i+1, value);
 				}
 				statement2.execute();
 			}

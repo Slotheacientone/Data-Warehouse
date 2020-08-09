@@ -51,6 +51,10 @@ public class ReadFile {
                 		if(ReadTXT.readValuesTXT(destination,fields, sourceFile, delimiter,idFile)) {
                 			update ="loaded";
                 		}
+                	}else if(typeFile.equals("csv")){
+                		if(ReadCSV.readValuesCSV(destination, fields, sourceFile, idFile)) {
+                			update ="loaded";
+                		}
                 	}
                 }else{
                 	if (typeFile.equals("xlsx")) {
@@ -58,11 +62,16 @@ public class ReadFile {
                 			update ="loaded";
                 		}
                 	}
-//                	else if(typeFile.equals("txt")){
-//                		if(ReadTXT.readValuesTXT(destination,fields, sourceFile, delimiter,idFile)) {
-//                			update ="loaded";
-//                		}
-//                	}
+                	else if(typeFile.equals("txt")){
+                		if(ReadTXTForMonHoc.readValuesTXT(destination,fields, sourceFile, delimiter,idFile)) {
+                			update ="loaded";
+                		}
+                	}
+                	else if(typeFile.equals("csv")){
+            		if(ReadCSVForMonHoc.readValuesCSV(destination, fields, sourceFile, idFile)) {
+            			update ="loaded";
+            		}
+            	}
                 }
             }
             String sqlUpdateStatusLog ="UPDATE log SET log.Status = '"+update+"' WHERE log.File_Name='"+nameFile+"';";
