@@ -1,6 +1,7 @@
 package loadFile;
 
 import connection.JDBCConnection;
+import sendMail.SendMailSSL;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -9,10 +10,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ReadFile {
-    public static void readFile(int idFile) throws IOException, ClassNotFoundException, SQLException {
+    public static void readFile(int idFile) throws  ClassNotFoundException, IOException  {
     	//check process
     	Connection connectionProcess = JDBCConnection.getConnection("db_control");
-        Statement statementProcess = connectionProcess.createStatement();
+		try {
+			Statement statementProcess = connectionProcess.createStatement();
+		
         ResultSet resultSetProcess = statementProcess.executeQuery("SELECT * FROM process;");
         if (resultSetProcess.next()) {
             String status = resultSetProcess.getString(2);
@@ -72,6 +75,14 @@ public class ReadFile {
         statementProcess.executeUpdate(sql2);
         statementProcess.close();
         connectionProcess.close();
+		} 
+        catch (SQLException e) {
+			// TODO Auto-generated catch block
+        	SendMailSSL.sendMail(e.toString());
+			e.printStackTrace();
+		}
+		
+		
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, SQLException {

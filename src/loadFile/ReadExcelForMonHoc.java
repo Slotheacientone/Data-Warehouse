@@ -17,6 +17,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import connection.JDBCConnection;
+import sendMail.SendMailSSL;
 
 public class ReadExcelForMonHoc {
 
@@ -118,21 +119,17 @@ public class ReadExcelForMonHoc {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Err!");
+			SendMailSSL.sendMail(e.toString());
 			e.printStackTrace();
 			return false;
 
-		} catch (IOException e) {
+		} catch (IOException | NullPointerException | SQLException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Err!");
+			SendMailSSL.sendMail(e.toString());
 			e.printStackTrace();
 			return false;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Err!");
-
-			e.printStackTrace();
-			return false;
-		}
+		} 
 
 	}
 

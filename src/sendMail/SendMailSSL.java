@@ -11,9 +11,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 public class SendMailSSL {
-	public static void main(String[] args) {
-		 
-        // Get properties object
+	public static void sendMail(String err) {
+		 // Get properties object
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.host", MailConfig.HOST_NAME);
@@ -33,7 +32,7 @@ public class SendMailSSL {
             MimeMessage message = new MimeMessage(session);
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(MailConfig.RECEIVE_EMAIL));
             message.setSubject("Error Load File");
-            message.setText("test mail");
+            message.setText(err);
  
             // send message
             Transport.send(message);
@@ -42,5 +41,6 @@ public class SendMailSSL {
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
-    }
+	}
+	
 }

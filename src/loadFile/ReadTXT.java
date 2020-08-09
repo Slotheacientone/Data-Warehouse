@@ -11,10 +11,11 @@ import java.sql.SQLException;
 import java.util.NoSuchElementException;
 
 import connection.JDBCConnection;
+import sendMail.SendMailSSL;
 
 public class ReadTXT {
 	public static boolean readValuesTXT(String destination, String fields, String sourceFile, String delimiter,int idFile)
-			throws SQLException {
+			{
 		File file = new File(sourceFile);
 		if (!file.exists()) {
 			return false;
@@ -75,12 +76,13 @@ public class ReadTXT {
 				statement2.execute();
 			}
 			bReader.close();
-			System.out.println("Done!");
 			statement2.close();
 			connection.close();
+			System.out.println("Done!");
 			return true;
-		} catch (NoSuchElementException | IOException e) {
+		} catch (NoSuchElementException | IOException |SQLException | NullPointerException e) {
 			System.out.println("err");
+			SendMailSSL.sendMail(e.toString());
 			e.printStackTrace();
 			return false;
 		}
