@@ -53,13 +53,16 @@ public class ReadExcel {
 		String sql2 = sql;
 		sql2 += ",?)";
 		sql += ",'Null')";
-
+		
+		String sqlTruncate = "TRUNCATE TABLE "+table+";";
 		Connection connection = JDBCConnection.getConnection(destination);
 		PreparedStatement statement2 = null;
-
+		
 		// lấy dữ liệu file.xlsx
 		FileInputStream fileInputStream;
 		try {
+			statement2= connection.prepareStatement(sqlTruncate);
+			statement2.executeUpdate();
 			fileInputStream = new FileInputStream(sourceFile);
 			// đưa fis về dạng file excel
 			XSSFWorkbook workbook = new XSSFWorkbook(fileInputStream);
