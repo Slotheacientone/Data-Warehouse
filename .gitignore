@@ -1,3 +1,8 @@
 /bin/
 .project
 .classpath
+/out/
+/lib/
+/.idea/
+/Data-Warehouse.iml
+/.settings/
