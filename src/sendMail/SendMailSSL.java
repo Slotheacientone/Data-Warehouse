@@ -31,7 +31,7 @@ public class SendMailSSL {
         try {
             MimeMessage message = new MimeMessage(session);
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(MailConfig.RECEIVE_EMAIL));
-            message.setSubject("Error Load File");
+            message.setSubject("Error");
             message.setText(err);
  
             // send message
