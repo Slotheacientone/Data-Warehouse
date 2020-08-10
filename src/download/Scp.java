@@ -1,6 +1,7 @@
 package download;
 
 import connection.JDBCConnection;
+import sendMail.SendMailSSL;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,9 +49,21 @@ public class Scp {
             String[] cmd = {"/home/slo/DataWarehouse/ScpScript.zsh", regrex};
             ProcessBuilder processBuilder = new ProcessBuilder(cmd);
             Process process = processBuilder.start();
-            process.waitFor();
+            int exitcode = process.waitFor();
+            switch (exitcode){
+                case 0: break;
+                case 1:
+                    System.out.println("Error in download process");
+                    SendMailSSL.sendMail("Error in download process");
+                    PreparedStatement processPreparedStatement1 = connection.prepareStatement("UPDATE `db_control`.`process` SET status=? WHERE (`process_name` = 'download');");
+                    processPreparedStatement1.setString(1, "finished");
+                    processPreparedStatement1.execute();
+                    processPreparedStatement1.close();
+                    connection.close();
+                    return;
+            }
         } catch (InterruptedException | IOException e) {
-            System.out.println(e.getMessage());
+            System.out.println(e.toString());
             PreparedStatement processPreparedStatement1 = connection.prepareStatement("UPDATE `db_control`.`process` SET status=? WHERE (`process_name` = 'download');");
             processPreparedStatement1.setString(1, "finished");
             processPreparedStatement1.execute();
@@ -86,7 +99,7 @@ public class Scp {
                     preparedStatementLog.setString(6, new Timestamp(System.currentTimeMillis()) + "");
                     preparedStatementLog.execute();
                 } catch (IOException e) {
-                    System.out.println(e.getMessage());
+                    System.out.println(e.toString());
                 }
             }
         }
